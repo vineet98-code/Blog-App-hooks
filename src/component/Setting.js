@@ -1,11 +1,12 @@
-import React, { Component } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { withRouter } from 'react-router-dom';
 import { CURRENT_USER_URL } from '../utils/Constant';
 import validate from '../utils/Validate';
 import UserContext from './UserContext';
 
-class Setting extends Component {
-  state = {
+const Setting = (props) => {
+
+  const initialProfileState = {
     image: '',
     username: '',
     bio: '',
@@ -19,28 +20,44 @@ class Setting extends Component {
       password: '',
     },
   };
+  
+  const [profile, setProfile] = useState(initialProfileState);
 
-  static contextType = UserContext;
-  componentDidMount() {
-    let { username, email, image, bio } = this.context.user;
-    this.setState({ username, email, image, bio });
-  }
+  let { user, updateUser } = useContext(UserContext);
 
-  handleChange = (event) => {
+  let { image, username, bio, email, password, errors } = profile;
+  
+  useEffect(() => {
+    let { username, email, image, bio } = user;
+    setProfile((profile) => {
+      return {
+        ...profile,
+        username,
+        email,
+        image,
+        bio,
+      };
+    });
+  }, [user])
+  
+  const handleChange = (event) => {
     let { name, value } = event.target;
-    let { errors } = this.state;
     validate(errors, name, value);
-    this.setState({ [name]: value });
+    setProfile((profile) => {
+       return { 
+        ...profile, 
+        [name]: value,
+       };
+      });
   };
 
-  handleLogout = () => {
-    localStorage.clear();
-    this.props.history.push('/');
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    props.history.push('/');
   };
 
-  handleSubmit = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
-    let { image, username, bio, email, password } = this.state;
     let body = {
       user: {
         email,
@@ -56,7 +73,7 @@ class Setting extends Component {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Token ' + this.context.user.token,
+        Authorization: 'Token ' + user.token,
       },
       body: JSON.stringify(body),
     })
@@ -67,25 +84,24 @@ class Setting extends Component {
         return res.json();
       })
       .then((user) => {
-        this.context.updateUser(user.user);
-        this.props.history.push('/');
+        updateUser(user.user);
+        props.history.push('/');
       })
       .catch((errors) => {
-        this.setState({ errors: errors.errors });
+        setProfile((profile) => {
+          return {
+            ...profile,
+            errors: errors.errors,
+          };
+        });
       });
   };
-
-  render() {
-
-    let { image, username, bio, email, password, errors } = this.state;
-
-    return (
-      
-      <section className="pt-8 px-64">
-        <form onSubmit={this.handleSubmit} className="border p-4 px-8 rounded shadow">
+  return (
+    <section className="pt-8 px-64">
+        <form onSubmit={handleSubmit} className="border p-4 px-8 rounded shadow">
         <h2 className="text-center text-2xl mt-4">Your Setting</h2>
           <input
-            onChange={this.handleChange}
+            onChange={handleChange}
             type="text"
             name="image"
             className="block w-full border rounded-lg border-gray-300 px-2  py-3 mx-auto mt-4 h-10"
@@ -93,7 +109,7 @@ class Setting extends Component {
             value={image}
           />
           <input
-            onChange={this.handleChange}
+            onChange={handleChange}
             name="username"
             type="text"
             className="block w-full border rounded-lg border-gray-300 px-2  py-3 mx-auto mt-4"
@@ -103,7 +119,7 @@ class Setting extends Component {
             {errors.username}
           </span>
           <textarea
-            onChange={this.handleChange}
+            onChange={handleChange}
             name="bio"
             className="block w-full border rounded-lg border-gray-300 px-2 py-3 mx-auto mt-4  text-gray-400"
             rows="6"
@@ -111,7 +127,7 @@ class Setting extends Component {
             value={bio}
           ></textarea>
           <input
-            onChange={this.handleChange}
+            onChange={handleChange}
             type="email"
             name="email"
             className="block w-full border rounded-lg border-gray-300 px-2  py-3 mx-auto mt-4"
@@ -120,7 +136,7 @@ class Setting extends Component {
           />
           <span className="text-red-500 block text-center">{errors.email}</span>
           <input
-            onChange={this.handleChange}
+            onChange={handleChange}
             name="password"
             type="password"
             className="block w-full border rounded-lg border-gray-300 px-2  py-3 mx-auto mt-4"
@@ -143,14 +159,14 @@ class Setting extends Component {
         <div className="w-full mx-auto text-left pt-8">
             <button
               className="border border-red-500 px-6 rounded text-red-500 inline-block submit h-10 hover:bg-red-500 hover:text-white"
-              onClick={this.handleLogout}
+              onClick={handleLogout}
             >
               Click here to logout.
             </button>
           </div>
       </section>
     );
-  }
+  
 }
 
 export default withRouter(Setting);

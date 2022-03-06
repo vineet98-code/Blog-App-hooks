@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { ARTICLES_URL } from '../utils/Constant';
 import Loader from './Loading';
 import CommentBox from './CommentBox';
@@ -7,14 +7,15 @@ import moment from 'moment';
 import UserContext from './UserContext';
 
 
-export class SinglePost extends Component {
-  state = { article: null, error: '' };
+const SinglePost = (props) =>{
 
-  static contextType = UserContext;
+const [article, setArticle] = useState(null);
+const [error, setError] = useState('')
 
-  componentDidMount() {
+let { user, isUserLogged } = useContext(UserContext);
 
-    let slug = this.props.match.params.slug;
+useEffect(() =>  {
+   let slug = props.match.params.slug;
 
     fetch(ARTICLES_URL + '/' + slug)
       .then((res) => {
@@ -22,20 +23,20 @@ export class SinglePost extends Component {
         else return res.json();
       })
       .then((data) => {
-        this.setState({ article: data.article });
+        setArticle(data.article);
       })
       .catch((error) => {
-        this.setState({ error: 'Unable to fetch article!' });
+        setError('Unable to fetch article!' );
       });
-  }
+  });
 
-  handleDelete = (slug) => {
+  const handleDelete = (slug) => {
 
     fetch(ARTICLES_URL + '/' + slug, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Token ' + this.context.user.token,
+        Authorization: 'Token ' + user.token,
       },
     })
     .then((res) => {
@@ -44,20 +45,18 @@ export class SinglePost extends Component {
         }
     })
     .then(() => {
-        this.props.history.push('/');
+        props.history.push('/');
     })
-    .catch((error) => this.setState({ error }));
+    .catch((error) => setError( error ));
   };
 
-  render() {
-    if (this.state.error)
+  if (error)
       return (
-        <p className="text-red-500 mt-8 text-lg text-center">{this.state.error}</p>
-      );
+     <p className="text-red-500 mt-8 text-lg text-center">{error}</p>
+  );
 
-    if (!this.state.article) return <Loader />;
-
-    let { author, createdAt, title, body, slug } = this.state.article;
+    if (!article) return <Loader />;
+    let { author, createdAt, title, body, slug } = article;
 
     return (
       <section className="px-40">
@@ -80,8 +79,8 @@ export class SinglePost extends Component {
               </time>
             </div>
 
-            {this.context.user &&
-            this.context.user.username === author.username ? (
+            {user &&
+            user.username === author.username ? (
               <div>
                 <button className="border border-gray-400 rounded ml-6 px-3 text-sm py-1 text-gray-400 hover:bg-gray-400 hover:text-white">
                   <Link to={`/edit-article/${slug}`}>
@@ -91,7 +90,7 @@ export class SinglePost extends Component {
                 <button
                   className="border border-red-400 rounded ml-2 px-3 text-sm py-1 text-red-400 hover:bg-red-400 hover:text-white"
                   onClick={() => {
-                    this.handleDelete(slug);
+                    handleDelete(slug);
                   }}
                 >
                   <i className="fas fa-trash-alt"></i> Delete Article
@@ -106,7 +105,7 @@ export class SinglePost extends Component {
         
         <div className="border-t border-gray-300 w-full mx-auto mt-8"></div>
         {/* if user not logged in, then display sign in and sign out otherwise don't display */}
-        {!this.context.isUserLogged ? (
+        {!isUserLogged ? (
           <h4 className="text-center mt-8">
             <Link className="text-primary text-lg  text-blue-600 visited:text-purple-600 ..." to="/login">
               Sign in
@@ -118,11 +117,11 @@ export class SinglePost extends Component {
             to add comments on this article
           </h4>
         ) : (
-          <CommentBox slug={this.props.match.params.slug} />
+          <CommentBox slug={props.match.params.slug} />
         )}
       </section>
     );
-  }
+  
 }
 
 // withRouter is used to access the history object

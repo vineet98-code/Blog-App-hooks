@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom';
 
 
@@ -9,6 +9,8 @@ class ErrorBoundary extends Component {
       hasError: false,
     };
   }
+
+  
   static getDerivedStateFromError(error) {
     return { hasError: true };
   }

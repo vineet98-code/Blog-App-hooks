@@ -3,8 +3,8 @@ import moment from 'moment';
 import { useContext } from 'react';
 import UserContext from './UserContext';
 
-
 const Comment = (props) => {
+  
   let { user } = useContext(UserContext);
   let { id, author, body, createdAt } = props.comment;
 
@@ -32,7 +32,7 @@ const Comment = (props) => {
               props.handleDelete(id);
             }}
           >
-            <i class="fas fa-trash-alt"></i>
+            <i className="fas fa-trash-alt"></i>
           </button>
         ) : (
           ''

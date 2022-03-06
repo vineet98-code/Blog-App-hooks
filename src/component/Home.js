@@ -1,92 +1,118 @@
-import React, { Component } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import Posts from './Posts';
 import Banner from './Banner';
 import Tags from './Tags';
 import { ARTICLES_URL } from '../utils/Constant';
 import Pagination from './Pagination';
 import FeedNav from './FeedNav';
+import UserContext from './UserContext';
 
-export default class Home extends Component {
+export default function Home() {
 
-  state = {
+  const articleDetailsInitialState = {
     articles: null,
     error: null,
     articlesCount: 0,
     articlePerPage: 10,
     activePageIndex: 0,
-    activeNav: '',
+    activeNav: 'global',
+    activeTag: '',
   };
 
-  componentDidMount() {
-    this.fetchData();
-  }
+  const [articleDetails, setArticleDetails] = useState(articleDetailsInitialState);
 
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      prevState.activePageIndex !== this.state.activePageIndex ||
-      prevState.activeNav !== this.state.activeNav
-    ) {
-      this.fetchData();
-    }
-  }
+  const { articlesCount, articlePerPage, activePageIndex, activeTag, activeNav } = articleDetails
 
-  removeTagTab = () => {
-    this.setState({ activeNav: '' });
-  };
+  let { user } = useContext(UserContext);
 
-  addTagTab = (tag) => {
-    this.setState({ activeNav: tag }, this.fetchData);
-  };
+  useEffect(() => {
+    const limit = articlePerPage;
+    const offset = activePageIndex * 10;
+    const tag = activeTag;
+    let feed = activeNav === 'your' ? '/feed' : '';
+    let token = user ? 'Token ' + user.token : '';
 
-  fetchData() {
-    const limit = this.state.articlePerPage;
-    const offset = this.state.activePageIndex * 10;
-    const tag = this.state.activeNav;
-    
-    fetch( ARTICLES_URL + `/?limit=${limit}&offset=${offset}`+(tag && `&tag=${tag}`))
+
+    fetch(ARTICLES_URL + `/${feed}/?limit=${limit}&offset=${offset}` + (tag && `&tag=${tag}`),
+      {
+        method: 'GET',
+        headers: {
+          'Conten-Type': 'application/json',
+          Authorization: token,
+        }
+      })
       .then((res) => {
         if (!res.ok) throw new Error(res.statusText);
         else return res.json();
       })
       .then((data) =>
-        this.setState({
-          articles: data.articles,
-          articlesCount: data.articlesCount,
+        setArticleDetails((articleDetails) => {
+          return {
+            ...articleDetails,
+            articles: data.articles,
+            articlesCount: data.articlesCount,
+          }
         })
       )
       .catch((error) =>
-        this.setState({ error: 'Not able to fetch articles!' })
+        setArticleDetails((articleDetails) => {
+          return {
+            ...articleDetails,
+            error: 'Not able to fetch articles!',
+          };
+        })
       );
-  }
+  }, [activePageIndex,articlePerPage, user, activeTag, activeNav]);
 
-  handlePagination = (pageIndex) => {
-    this.setState({ activePageIndex: pageIndex });
+  const handleNavigation = (tab) => {
+    setArticleDetails((articleDetails) => {
+      return {
+        ...articleDetails,
+        activeTag: '',
+        activeNav: tab,
+        activePageIndex: 0,
+      };
+    });
   };
 
-  render() {
-    let { articlesCount, articlePerPage, activePageIndex, activeNav } = this.state;
+  const addTagTab = (tag) => {
+    setArticleDetails((articleDetails) => {
+      return {
+        ...articleDetails,
+        activeTag: tag,
+        activeNav: '',
+        activePageIndex: 0,
+      };
+    });
+  };
 
-    return (
-      <main>
-        <Banner />
-        <div className="px-40">
-          <div className="flex">
-            <div className="w-8/12">
-              <FeedNav activeNav={activeNav} removeTagTab={this.removeTagTab} />
-              <Posts {...this.state} />
-            </div>
-            <div className="w-3/12 ml-12 mt-4">
-              <Tags addTagTab={this.addTagTab} activeNav={activeNav} />
-            </div>
+  const handlePagination = (pageIndex) => {
+    setArticleDetails((articleDetails) => {
+      return { ...articleDetails, activePageIndex: pageIndex };
+    });
+  };
+
+  return (
+    <main>
+      <Banner />
+      <div className="px-40">
+        <div className="flex">
+          <div className="w-8/12">
+            <FeedNav activeNav={activeNav} activeTag={activeTag} handleNavigation={handleNavigation} />
+            <Posts {...articleDetails} />
           </div>
-          <Pagination
-            articlesCount={articlesCount}
-            articlePerPage={articlePerPage}
-            handlePagination={this.handlePagination}
-            activePageIndex={activePageIndex}
-          />
+          <div className="w-3/12 ml-12 mt-4">
+            <Tags addTagTab={addTagTab} activeNav={activeNav} />
+          </div>
         </div>
-      </main>
-    );
-  }
+        <Pagination
+          articlesCount={articlesCount}
+          articlePerPage={articlePerPage}
+          handlePagination={handlePagination}
+          activePageIndex={activePageIndex}
+        />
+      </div>
+    </main>
+  );
+
 }

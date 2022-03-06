@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Switch, Route } from "react-router-dom";
 import Header from './component/Header';
 import Loader from './component/Loading';
@@ -9,22 +9,21 @@ import NoMatch from './component/NoMatch';
 import SinglePost from './component/SinglePost';
 import NewPost from './component/NewPost';
 import UserContext from './component/UserContext';
-import ErrorBoundary from './component/ErrorBoundary';
-import { LocalStorageKey, CURRENT_USER_URL } from './utils/Constant'
+import {LocalStorageKey, CURRENT_USER_URL } from './utils/Constant'
 import EditArticle from './component/EditArticle';
 import Setting from './component/Setting';
 import Profile from './component/Profile';
+import ErrorBoundary from './component/ErrorBoundary';
 
-class App extends Component {
-  state = {
-    user: null,
-    isUserLogged: false,
-    userVerifying: true,
-  };
+function App(props) {
 
-  componentDidMount() {
-    let token = localStorage[LocalStorageKey];
-    if (token) {
+  const [user, setUser] = useState(null);
+  const [isUserLogged, setIsUserLogged] = useState(false);
+  const [userVerifying, setUserVerifying] = useState(false);
+
+  useEffect(() => {
+    let token = localStorage.getItem(LocalStorageKey);
+    
       fetch(CURRENT_USER_URL, {
         method: 'GET',
         headers: {
@@ -38,44 +37,46 @@ class App extends Component {
           }
           return res.json();
         })
-        .then(({ user }) => {
-          this.updateUser(user);
+        .then((user) => {
+          setUser(user.user);
         })
         .catch((errors) => {
           console.log(errors);
         });
-    } else {
-      this.setState({ userVerifying: false });
-    }
-  }
-  updateUser = (user) => {
-    this.setState({ user, isUserLogged: true, userVerifying: false });
+    
+  }, [])
+
+ const updateUser = (user) => {
+    setUser(user);
+    setIsUserLogged(true);
+    setUserVerifying(true);
     localStorage.setItem(LocalStorageKey, user.token);
   };
-  render() {
-    if (this.state.userVerifying) {
-      return <Loader />;
-    }
-    let { isUserLogged, user } = this.state;
-    return (
-      <div>
-        <UserContext.Provider
-          value={{ isUserLogged, user, updateUser: this.updateUser }}
-        >
-          <ErrorBoundary>
-            <Header />
-          </ErrorBoundary>
-          <ErrorBoundary>
-            {this.state.isUserLogged ? (
-              <AuthenticatedApp />
-            ) : (
-              <UnAuthenticatedApp />
-            )}
-          </ErrorBoundary>
-        </UserContext.Provider>
-      </div>
-    );
+
+   if (userVerifying) {
+    <Loader />
   }
+
+  return (
+    <div>
+      <ErrorBoundary>
+
+        <UserContext.Provider
+          value={{user:user, isUserLogged: isUserLogged, updateUser: updateUser, userVerifying: userVerifying }}>
+
+          <Header />
+
+          {isUserLogged ? (
+            <AuthenticatedApp />
+          ) : (
+            <UnAuthenticatedApp />
+          )}
+
+        </UserContext.Provider>
+      </ErrorBoundary>
+    </div>
+
+  );
 }
 
 function AuthenticatedApp(props) {
@@ -120,7 +121,7 @@ function UnAuthenticatedApp(props) {
       <Route path="/signup">
         <SignUp />
       </Route>
-      
+
       <Route path="*">
         <NoMatch />
       </Route>

@@ -1,23 +1,19 @@
-import React, { Component } from 'react';
+import React, { useContext, useState, useEffect} from 'react';
 import { PROFILE_URL } from '../utils/Constant';
 import ToggleFollowButton from './ToggleFollowButton';
 import Loader from './Loading';
 import UserContext from './UserContext';
 
-export default class ProfileBanner extends Component {
-  state = {
-    profile: null,
-    error: null,
-  };
+const ProfileBanner = (props) => {
+  
+   const [profile, setProfile] = useState(null);
+   const [error, setError] = useState(null)
 
-  static contextType = UserContext;
+  let { user } = useContext(UserContext);
 
-  componentDidMount() {
-
-    let {username} = this.props;//username from slug
-    let {user} = this.context;//current user
-    let token = user ? 'Token ' + user.token : '';
-
+  useEffect(() => {
+    let {username} = props;//username from slug
+     let token = user ? 'Token ' + user.token : '';
     fetch(PROFILE_URL + '/' + username, {
       method: 'GET',
       headers: {
@@ -31,16 +27,14 @@ export default class ProfileBanner extends Component {
         }
         return res.json();
       })
-      .then((profile) => this.setState({ profile: profile.profile }))
-      .catch((error) => this.setState({ error }));
-  }
+      .then((profile) => setProfile( profile.profile ))
+      .catch((error) => {
+        setError(error);
+      })
+  });
 
-  render() {
-
-    if (!this.state.profile) return <Loader />;
-    
-    let { username, image} = this.state.profile;
-    
+    if (!profile) return <Loader />;
+    let { username, image } = profile;
     return (
       <div className="bg-gray-200 py-4 text-center">
         <img
@@ -51,12 +45,14 @@ export default class ProfileBanner extends Component {
         <h3 className="font-bold text-xl text-gray-700 mt-4">{username}</h3>
         <div className="text-right pr-60">
           <ToggleFollowButton
-            profile={this.state.profile}
+            profile={profile}
           />
         </div>
       </div>
-    );
-  }
+  );
+  
 }
+
+export default ProfileBanner;
 
 

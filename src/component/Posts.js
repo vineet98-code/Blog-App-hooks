@@ -4,7 +4,7 @@ import Post from './Post';
 
 
 function Posts(props) {
- const { articles, error } = props
+  const { articles, error } = props
   if (error) {
     return <p className="text-3xl text-center mt-4 text-red-500">{error}</p>
   }

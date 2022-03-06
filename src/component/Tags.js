@@ -1,26 +1,25 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect} from 'react';
 import { TAGS_URL } from '../utils/Constant';
 import Loader from './Loading';
 
-export default class Tags extends Component {
+const Tags = (props) => {
 
-  state = { tags: null, error: null };
+const [tags, setTags] = useState(null)
+const [error, setError] = useState(null)
 
-  componentDidMount() {
+  useEffect(() => {
     fetch(TAGS_URL)
       .then((res) => {
         if (!res.ok) throw new Error(res.statusText);
         else return res.json();
       })
-      .then((data) => this.setState({ tags: data.tags.filter(tag=>tag) }))
-      .catch((error) => this.setState({ error: 'Not able to fetch data!' }));
-  }
-
-  render() {
-    
-    let { tags, error } = this.state;
-
-    let { activeTag, addTagTab } = this.props;
+      .then((data) => setTags(data.tags.filter(tag=>tag) ))
+      .catch((error) => {
+        setError('Not able to fetch data!');
+      });
+  }, [])
+  
+  let { activeTag, addTagTab } = props;
 
     if (error) {
       return <p className="text-3xl text-center mt-4 text-red-500">{error}</p>;
@@ -48,5 +47,6 @@ export default class Tags extends Component {
         </ul>
       </aside>
     );
-  }
 }
+
+export default Tags;
