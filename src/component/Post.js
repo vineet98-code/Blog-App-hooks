@@ -6,45 +6,45 @@ import UserContext from './UserContext';
 
 function Post(props) {
 
-   const [favorited, setFavorited] = useState(null)
-   const [favoritesCount, setFavoritesCount] = useState(0)
-   const [error, setError] = useState(0)
+  const [favorited, setFavorited] = useState(null)
+  const [favoritesCount, setFavoritesCount] = useState(0)
+  const [error, setError] = useState(0)
 
-   const { user } = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
-   
-   useEffect(() => {
-     setFavorited(props.favorited);
-     setFavoritesCount(props.favoritesCount);
-     
-    }, []);
-    
-    const handleFavorite = ((slug) => {
-      
-      let method = favorited ? 'DELETE' : 'POST';
-      
-      let token = user ? 'Token ' + user.token : '';
-      
-      fetch(ARTICLES_URL + `/${slug}/favorite`, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: token,
-        },
-      })
+
+  useEffect(() => {
+    setFavorited(props.favorited);
+    setFavoritesCount(props.favoritesCount);
+
+  }, []);
+
+  const handleFavorite = ((slug) => {
+
+    let method = favorited ? 'DELETE' : 'POST';
+
+    let token = user ? 'Token ' + user.token : '';
+
+    fetch(ARTICLES_URL + `/${slug}/favorite`, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token,
+      },
+    })
       .then((res) => res.json())
       .then((article) => {
         let { favorited, favoritesCount } = article.article;
-        // console.log(favorited, favoritesCount);
         setFavorited(favorited);
         setFavoritesCount(favoritesCount);
       })
       .catch((error) => {
         setError(error.message);
       })
-    });
-    
+  });
+
   let { author, createdAt, title, description, tagList, slug } = props;
+
   if (error)
     return <p className="text-3xl text-center mt-4 text-red-500">{error}</p>;
   return (

@@ -1,26 +1,22 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { withRouter } from 'react-router';
 import validate from '../utils/Validate';
 import { SIGNUp_URL } from '../utils/Constant';
-import UserContext from './UserContext';
 import { useHistory } from 'react-router-dom'
 
-function SignUp(props) {
+function SignUp() {
 
   const [credential, setCredential] = useState({
     username: '',
     email:"", 
     password:"", 
-    errors: {
-    email: '',
-    password: '',
-    } });
+    errors: { email: '', password: ''} 
+  });
   
   let history = useHistory();
-  let {username, email, password, errors } = credential
 
-  let { updateUser } = useContext(UserContext);
+  let {username, email, password, errors } = credential
 
   const handleChange = (event) => {
     let { name, value } = event.target;
@@ -55,8 +51,6 @@ function SignUp(props) {
         return res.json();
       })
       .then((user) => {
-        updateUser(user.user);
-        setCredential(user);
         history.push('/login');
       })
       .catch((errors) =>
@@ -68,8 +62,7 @@ function SignUp(props) {
         })
       );
   };
- 
-    return (
+  return (
       <main>
         <section className="mt-20 px-8">
           <form className="w-full md:w-1/3 mx-auto border border-gray-400 p-6 rounded-md" onSubmit={handleSubmit}>
@@ -90,14 +83,11 @@ function SignUp(props) {
               <span className="text-red-500">{errors.password}</span>
               <input className="block w-full my-3 py-2 px-3 border border-gray-400 rounded-md" type="text" placeholder="Enter Password" value={password} name="password" onChange={handleChange} />
 
-              <input type="submit" disabled={errors.email || errors.password || errors.username } value="SignUp" className="block w-full my-6 py-2 px-3 bg-blue-500 text-white font-bold cursor-pointer" />
-
+              <input type="submit" disabled={errors.email || errors.password || errors.username } className="block w-full my-6 py-2 px-3 bg-blue-500 text-white font-bold cursor-pointer" />
             </fieldset>
           </form>
         </section>
       </main>
     )
   }
-
-
 export default withRouter(SignUp);

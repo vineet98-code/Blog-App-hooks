@@ -2,7 +2,6 @@ import React, { useContext } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import UserContext from './UserContext';
 
-
 export default function Header(props) {
 
   let {isUserLogged} = useContext(UserContext);
@@ -10,10 +9,10 @@ export default function Header(props) {
   return (
     <header className="px-40 flex justify-between items-center">
       <button className="text-primary font-bold text-2xl py-3">
-        <Link to="/">AltCampus</Link>
+        <Link to="/">BlogApp</Link>
       </button>
       {isUserLogged ? (
-        <AuthHeader />
+        <AuthHeader  />
       ) : (
         <NonAuthHeader />
       )}
@@ -35,7 +34,7 @@ function NonAuthHeader() {
         </NavLink>
       </button>
       <button className="text-gray-400 ml-6">
-        <NavLink activeClassName="active" to="/signUp">
+        <NavLink activeClassName="active" to="/register">
           Sign Up
         </NavLink>
       </button>

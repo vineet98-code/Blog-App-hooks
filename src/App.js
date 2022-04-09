@@ -1,79 +1,77 @@
 import React, { useState, useEffect } from 'react';
 import { Switch, Route } from "react-router-dom";
 import Header from './component/Header';
-import Loader from './component/Loading';
+import Loader from './component/Loader';
 import Home from './component/Home';
 import Login from './component/Login';
 import SignUp from './component/SignUp';
-import NoMatch from './component/NoMatch';
+import NotFound from './component/NotFound';
 import SinglePost from './component/SinglePost';
 import NewPost from './component/NewPost';
 import UserContext from './component/UserContext';
-import {LocalStorageKey, CURRENT_USER_URL } from './utils/Constant'
+import { LocalStorageKey, User_Verify_URL } from './utils/Constant'
 import EditArticle from './component/EditArticle';
 import Setting from './component/Setting';
 import Profile from './component/Profile';
-import ErrorBoundary from './component/ErrorBoundary';
+
 
 function App(props) {
 
   const [user, setUser] = useState(null);
   const [isUserLogged, setIsUserLogged] = useState(false);
-  const [userVerifying, setUserVerifying] = useState(false);
+  const [userVerifying, setUserVerifying] = useState(true);
 
   useEffect(() => {
-    let token = localStorage.getItem(LocalStorageKey);
-    
-      fetch(CURRENT_USER_URL, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Token ${token}`,
-        },
+    let token = localStorage[LocalStorageKey];
+    console.log(token);
+
+    fetch(User_Verify_URL, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Token ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((errors) => Promise.reject(errors));
+        }
+        return res.json();
       })
-        .then((res) => {
-          if (!res.ok) {
-            return res.json().then((errors) => Promise.reject(errors));
-          }
-          return res.json();
-        })
-        .then((user) => {
-          setUser(user.user);
-        })
-        .catch((errors) => {
-          console.log(errors);
-        });
-    
+      .then((user) => {
+        setUser(user.user);
+      })
+      .catch((errors) => {
+        console.log(errors);
+      });
+
   }, [])
 
- const updateUser = (user) => {
+  const updateUser = (user) => {
     setUser(user);
     setIsUserLogged(true);
-    setUserVerifying(true);
+    setUserVerifying(false);
     localStorage.setItem(LocalStorageKey, user.token);
   };
 
-   if (userVerifying) {
+  if (userVerifying) {
     <Loader />
   }
 
   return (
     <div>
-      <ErrorBoundary>
+      <UserContext.Provider
+        value={{ user: user, isUserLogged: isUserLogged, updateUser: updateUser, userVerifying: userVerifying }}>
 
-        <UserContext.Provider
-          value={{user:user, isUserLogged: isUserLogged, updateUser: updateUser, userVerifying: userVerifying }}>
+        <Header />
 
-          <Header />
+        {isUserLogged ? (
+          <AuthenticatedApp />
+        ) : (
+          <UnAuthenticatedApp />
+        )}
 
-          {isUserLogged ? (
-            <AuthenticatedApp />
-          ) : (
-            <UnAuthenticatedApp />
-          )}
-
-        </UserContext.Provider>
-      </ErrorBoundary>
+      </UserContext.Provider>
     </div>
 
   );
@@ -101,7 +99,7 @@ function AuthenticatedApp(props) {
         <Profile />
       </Route>
       <Route path="*">
-        <NoMatch />
+        <NotFound />
       </Route>
     </Switch>
   );
@@ -118,12 +116,11 @@ function UnAuthenticatedApp(props) {
       <Route path="/login">
         <Login />
       </Route>
-      <Route path="/signup">
+      <Route path="/register">
         <SignUp />
       </Route>
-
       <Route path="*">
-        <NoMatch />
+        <NotFound />
       </Route>
     </Switch>
   );

@@ -1,15 +1,16 @@
 import React from 'react'
-import Loading from './Loading'
+import Loader from './Loader'
 import Post from './Post';
 
-
 function Posts(props) {
+
   const { articles, error } = props
+  
   if (error) {
     return <p className="text-3xl text-center mt-4 text-red-500">{error}</p>
   }
   if (!articles) {
-    return <Loading />
+    return <Loader />
   }
   return (
     <ul>

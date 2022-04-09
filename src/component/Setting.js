@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { withRouter } from 'react-router-dom';
-import { CURRENT_USER_URL } from '../utils/Constant';
+import { User_Verify_URL } from '../utils/Constant';
 import validate from '../utils/Validate';
 import UserContext from './UserContext';
 
@@ -69,7 +69,7 @@ const Setting = (props) => {
 
     if (password) body.user.password = password;
 
-    fetch(CURRENT_USER_URL, {
+    fetch(User_Verify_URL, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

@@ -1,5 +1,5 @@
 import { useEffect, useContext } from 'react';
-import Loader from './Loading';
+import Loader from './Loader';
 import Comment from './Comment';
 import { ARTICLES_URL } from '../utils/Constant';
 import UserContext from './UserContext';

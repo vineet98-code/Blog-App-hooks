@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect} from 'react';
 import { PROFILE_URL } from '../utils/Constant';
-import ToggleFollowButton from './ToggleFollowButton';
-import Loader from './Loading';
+import ToggleFollowButton from './ToggleFollow';
+import Loader from './Loader';
 import UserContext from './UserContext';
 
 const ProfileBanner = (props) => {

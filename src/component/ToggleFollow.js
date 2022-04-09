@@ -2,15 +2,21 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { PROFILE_URL } from '../utils/Constant';
 import UserContext from './UserContext';
-export default class ToggleFollowButton extends Component {
+
+export default class ToggleFollow extends Component {
   state = {
     following: null,
     error: null,
   };
+
+
   static contextType = UserContext;
+
   componentDidMount() {
     this.setState({ following: this.props.profile.following });
   }
+
+
   handleFollow = (username) => {
     let method = this.state.following ? 'DELETE' : 'POST';
     fetch(PROFILE_URL + `/${username}/follow`, {
@@ -33,9 +39,11 @@ export default class ToggleFollowButton extends Component {
         this.setState({ error: 'Unable to fetch data!' });
       });
   };
+
   render() {
-    let currentUsername =
-      this.context.user && this.context.user.username;
+    
+    let currentUsername = this.context.user && this.context.user.username;
+
     let { username } = this.props.profile;
     let { error } = this.state;
     if (error)

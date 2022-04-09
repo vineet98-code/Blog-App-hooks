@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from 'react';
 import { TAGS_URL } from '../utils/Constant';
-import Loader from './Loading';
+import Loader from './Loader';
 
 const Tags = (props) => {
 

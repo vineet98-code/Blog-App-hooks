@@ -6,14 +6,14 @@ function FeedNav(props) {
    
   let { user } = useContext(UserContext);
   
-  let { activeTag, handleNavigation, activeNav } = props;
+  let { tagSelected, handleNavigation, activeNav } = props;
 
   return (
       <nav className="mt-8">
         <ul className="border-b flex">
           <li
             className={`text-gray-400 px-6 pb-2 cursor-pointer ${
-              !activeTag && activeNav === 'global'
+              !tagSelected && activeNav === 'global'
               ? 'border-b-2 border-green-500'
               : ''
             }`}
@@ -26,7 +26,7 @@ function FeedNav(props) {
             {user && (
               <li
                 className={`text-gray-400 px-6 pb-2 cursor-pointer ${
-                  !activeTag && activeNav === 'your'
+                  !tagSelected && activeNav === 'your'
                     ? 'border-b-2 border-green-500'
                     : ''
                 }`}
@@ -38,13 +38,13 @@ function FeedNav(props) {
               </li>
             )}
 
-          {activeTag && (
+          {tagSelected && (
             <li
               className={`text-gray-400 px-6 pb-2 cursor-pointer ${
-                activeTag ? 'border-b-2 border-green-500' : ''
+                tagSelected ? 'border-b-2 border-green-500' : ''
               }`}
             >
-              {activeTag}
+              {tagSelected}
             </li>
           )}
         </ul>

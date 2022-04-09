@@ -7,7 +7,7 @@ export default function validate(errors, name, value){
               break;
         case 'username':
           let usernameError;
-           if(value.length < 7){
+           if(value.length < 5){
             usernameError = "username can't be less then 6 character" 
           }
               errors.username = usernameError;
@@ -15,8 +15,8 @@ export default function validate(errors, name, value){
         case 'password':
           let passwordError;
               
-              if(value.length < 7){
-                passwordError = "Password can't be less then 6 character" 
+              if(value.length < 4){
+                passwordError = "Password can't be less then 5 character" 
               }
               let re = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]/;
               if(!re.test(value)){

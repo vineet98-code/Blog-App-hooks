@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { ARTICLES_URL } from '../utils/Constant';
 import validate from '../utils/Validate';
 import { withRouter } from 'react-router-dom';
-import Loader from './Loading';
+import Loader from './Loader';
 import UserContext from './UserContext';
 
 const EditArticle = (props) => {

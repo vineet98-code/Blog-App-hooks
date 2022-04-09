@@ -1,34 +1,47 @@
 import React, { useState, useContext, useEffect } from 'react';
 import Posts from './Posts';
-import Banner from './Banner';
+import SearchBar from './SearchBar';
 import Tags from './Tags';
 import { ARTICLES_URL } from '../utils/Constant';
 import Pagination from './Pagination';
 import FeedNav from './FeedNav';
 import UserContext from './UserContext';
 
-export default function Home() {
+const articleState = {
+  articles: null,
+  error: null,
+  articlesCount: 0,
+  articlePerPage: 10,
+  activePageIndex: 0,
+  activeNav: 'global',
+  tagSelected: '',
+};
 
-  const articleDetailsInitialState = {
-    articles: null,
-    error: null,
-    articlesCount: 0,
-    articlePerPage: 10,
-    activePageIndex: 0,
-    activeNav: 'global',
-    activeTag: '',
-  };
+function Home() {
+  
+  const [searchQuery, setSearchQuery] = useState('')
 
-  const [articleDetails, setArticleDetails] = useState(articleDetailsInitialState);
+  const [articleCredentials, setArticleCredentials] = useState(articleState);
 
-  const { articlesCount, articlePerPage, activePageIndex, activeTag, activeNav } = articleDetails
+  const {articles, articlesCount, articlePerPage, activePageIndex, tagSelected, activeNav } = articleCredentials
 
   let { user } = useContext(UserContext);
+  
+  // searching function
+  const getArticle = () => {
+    if(searchQuery.length > 2){
+      return articles.filter((article) => {
+        const articleName = article.title.toLowerCase();
+        return articleName.includes(searchQuery)
+      })
+    }
+    return articles;
+  }
 
   useEffect(() => {
     const limit = articlePerPage;
     const offset = activePageIndex * 10;
-    const tag = activeTag;
+    const tag = tagSelected;
     let feed = activeNav === 'your' ? '/feed' : '';
     let token = user ? 'Token ' + user.token : '';
 
@@ -46,29 +59,29 @@ export default function Home() {
         else return res.json();
       })
       .then((data) =>
-        setArticleDetails((articleDetails) => {
+      setArticleCredentials((articleCredentials) => {
           return {
-            ...articleDetails,
+            ...articleCredentials,
             articles: data.articles,
             articlesCount: data.articlesCount,
           }
         })
       )
       .catch((error) =>
-        setArticleDetails((articleDetails) => {
+      setArticleCredentials((articleCredentials) => {
           return {
-            ...articleDetails,
+            ...articleCredentials,
             error: 'Not able to fetch articles!',
           };
         })
       );
-  }, [activePageIndex,articlePerPage, user, activeTag, activeNav]);
+  }, [activePageIndex,articlePerPage, user, tagSelected, activeNav]);
 
   const handleNavigation = (tab) => {
-    setArticleDetails((articleDetails) => {
+    setArticleCredentials((articleCredentials) => {
       return {
-        ...articleDetails,
-        activeTag: '',
+        ...articleCredentials,
+        tagSelected: '',
         activeNav: tab,
         activePageIndex: 0,
       };
@@ -76,10 +89,10 @@ export default function Home() {
   };
 
   const addTagTab = (tag) => {
-    setArticleDetails((articleDetails) => {
+    setArticleCredentials((articleCredentials) => {
       return {
-        ...articleDetails,
-        activeTag: tag,
+        ...articleCredentials,
+        tagSelected: tag,
         activeNav: '',
         activePageIndex: 0,
       };
@@ -87,19 +100,19 @@ export default function Home() {
   };
 
   const handlePagination = (pageIndex) => {
-    setArticleDetails((articleDetails) => {
-      return { ...articleDetails, activePageIndex: pageIndex };
+    setArticleCredentials((articleCredentials) => {
+      return { ...articleCredentials, activePageIndex: pageIndex };
     });
   };
 
   return (
     <main>
-      <Banner />
+      <SearchBar setSearchQuery={setSearchQuery} searchQuery={searchQuery}/>
       <div className="px-40">
         <div className="flex">
           <div className="w-8/12">
-            <FeedNav activeNav={activeNav} activeTag={activeTag} handleNavigation={handleNavigation} />
-            <Posts {...articleDetails} />
+            <FeedNav activeNav={activeNav} tagSelected={tagSelected} handleNavigation={handleNavigation} />
+            <Posts {...articleCredentials}  articles={getArticle()}/>
           </div>
           <div className="w-3/12 ml-12 mt-4">
             <Tags addTagTab={addTagTab} activeNav={activeNav} />
@@ -116,3 +129,5 @@ export default function Home() {
   );
 
 }
+
+export default Home;
