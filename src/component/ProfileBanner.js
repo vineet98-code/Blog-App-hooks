@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect} from 'react';
 import { PROFILE_URL } from '../utils/Constant';
-import ToggleFollowButton from './ToggleFollow';
+import ToggleFollow from './ToggleFollow';
 import Loader from './Loader';
 import UserContext from './UserContext';
 
@@ -44,7 +44,7 @@ const ProfileBanner = (props) => {
         />
         <h3 className="font-bold text-xl text-gray-700 mt-4">{username}</h3>
         <div className="text-right pr-60">
-          <ToggleFollowButton
+          <ToggleFollow
             profile={profile}
           />
         </div>

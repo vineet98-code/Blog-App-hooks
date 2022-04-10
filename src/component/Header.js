@@ -4,21 +4,21 @@ import UserContext from './UserContext';
 
 export default function Header(props) {
 
-  let {isUserLogged} = useContext(UserContext);
-
+  let { isUserLogged } = useContext(UserContext);
   return (
     <header className="px-40 flex justify-between items-center">
       <button className="text-primary font-bold text-2xl py-3">
         <Link to="/">BlogApp</Link>
       </button>
       {isUserLogged ? (
-        <AuthHeader  />
+        <AuthHeader />
       ) : (
         <NonAuthHeader />
       )}
     </header>
   );
 }
+
 
 function NonAuthHeader() {
   return (
@@ -43,7 +43,8 @@ function NonAuthHeader() {
 }
 
 function AuthHeader(props) {
-  let {user} = useContext(UserContext);
+  let { user } = useContext(UserContext);
+
   return (
     <div className="font-roboto">
       <button className="text-gray-400 ml-6">
@@ -56,11 +57,7 @@ function AuthHeader(props) {
           <i className="fas fa-edit"></i>New Article
         </NavLink>
       </button>
-      <button className="text-gray-400 ml-6">
-        <NavLink activeClassName="active" to="/setting">
-          <i className="fas fa-cog"></i> Setting
-        </NavLink>
-      </button>
+
       <button className="text-gray-400 ml-6">
         <NavLink
           activeClassName="active"

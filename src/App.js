@@ -7,7 +7,7 @@ import Login from './component/Login';
 import SignUp from './component/SignUp';
 import NotFound from './component/NotFound';
 import SinglePost from './component/SinglePost';
-import NewPost from './component/NewPost';
+import AddPost from './component/AddPost';
 import UserContext from './component/UserContext';
 import { LocalStorageKey, User_Verify_URL } from './utils/Constant'
 import EditArticle from './component/EditArticle';
@@ -87,7 +87,7 @@ function AuthenticatedApp(props) {
         <SinglePost />
       </Route>
       <Route path="/new-post">
-        <NewPost />
+        <AddPost />
       </Route>
       <Route path="/edit-article/:slug">
         <EditArticle />

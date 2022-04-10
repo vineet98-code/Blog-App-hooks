@@ -61,24 +61,13 @@ const SinglePost = (props) => {
   return (
     <section className="px-40">
       <div className="bg-secondaryshadow">
-        <h1 className="text-white text-5xl mb-8">{title}</h1>
-        <div className="flex items-center">
+        <h1 className="text-black text-3xl mb-8">{title}</h1>
+        <div className="flex rounded-full ">
           <img
-            className="w-8 rounded-full h-8 object-cover"
+            className="flex"
             src={author.image}
             alt={author.username}
           />
-          <div className="ml-1">
-            <h4 className="text-primary neg-mb-10">
-              <Link to={'/profile/' + author.username}>
-                {author.username}
-              </Link>
-            </h4>
-            <time dateTime="" className="text-xs text-gray-400 inline-block">
-              {moment(createdAt).format('ddd MMM D YYYY')}
-            </time>
-            {/* <p className="px-40 py-10 text-lg text-gray-600">{body}</p> */}
-          </div>
 
           {user &&
             user.username === author.username ? (
@@ -102,7 +91,18 @@ const SinglePost = (props) => {
           )}
         </div>
       </div>
-      <p className="px-40 py-10 text-lg text-gray-600">{body}</p>
+      <p className=" py-10 text-lg text-gray-600">{body}</p>
+      <div className="ml-1">
+            <h4 className="text-primary neg-mb-10">
+              <Link to={'/profile/' + author.username}>
+                {author.username}
+              </Link>
+            </h4>
+            <time dateTime="" className="text-xs text-gray-400 inline-block">
+              {moment(createdAt).format('ddd MMM D YYYY')}
+            </time>
+            
+          </div>
 
       <div className="border-t border-gray-300 w-full mx-auto mt-8"></div>
       

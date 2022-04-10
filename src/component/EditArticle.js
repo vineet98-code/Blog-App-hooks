@@ -5,19 +5,20 @@ import { withRouter } from 'react-router-dom';
 import Loader from './Loader';
 import UserContext from './UserContext';
 
-const EditArticle = (props) => {
-  const editArticleIntialState = {
+const editArticleIntialState = {
+  title: '',
+  description: '',
+  body: '',
+  tagList: '',
+  errors: {
     title: '',
     description: '',
     body: '',
     tagList: '',
-    errors: {
-      title: '',
-      description: '',
-      body: '',
-      tagList: '',
-    },
-  };
+  },
+};
+
+const EditArticle = (props) => {
   const [article, setArtcle] = useState(editArticleIntialState);
   const [error, setError] = useState(null);
   const [isDataFetched, setIsDataFetched] = useState(false);

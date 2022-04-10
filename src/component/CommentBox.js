@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react';
 import { ARTICLES_URL } from '../utils/Constant';
-import Comment from './Comments';
+import Comments from './Comments';
 import UserContext from './UserContext';
 
-function CommentBox({slug}) {
+function CommentBox({ slug }) {
 
   const [comments, setComments] = useState(null);
   const [error, setError] = useState(null);
@@ -65,43 +65,39 @@ function CommentBox({slug}) {
       .catch((error) =>
         setError(error)
       );
-  
   };
-    return (
-      <section className="px-48 pt-12">
-        <form
-          className="border rounded border-gray-200"
-          onSubmit={handleSubmit}
-        >
-          <textarea
-            name="body"
-            rows="3"
-            className=" w-full text-gray-400 p-4"
-            onChange={handleChange}
-            placeholder="Write a comment..."
-            value={body}
-            required={true}
-          ></textarea>
-          <div className="p-2 border-t text-right ">
-            
-            <button
-              className="bg-green-700 px-4 py-3 rounded text-white inline-block"
-              type="submit"
-            >
-              Post Comment
-            </button>
-          </div>
-        </form>
-        <Comment
-          slug={slug}
-          fetchComments={fetchComments}
-          comments={comments}
-          error={error}
-          setError={setError}
-        />
-      </section>
+  return (
+    <section>
+      <form
+        className="rounded border-gray-200"
+        onSubmit={handleSubmit}
+      >
+        <input
+          name="body"
+          className=" w-full p-4"
+          onChange={handleChange}
+          placeholder="Write a comment..."
+          value={body}
+          required={true}
+        ></input>
+        <div className="flex flex-row-reverse my-4">
+
+        <button className="bg-green-700 px-4 py-3 rounded text-white" type="submit">
+            Post Comment
+        </button>
+        </div>
+        
+      </form>
+      <Comments
+        slug={slug}
+        fetchComments={fetchComments}
+        comments={comments}
+        error={error}
+        setError={setError}
+      />
+    </section>
   );
-  
+
 }
 
 export default CommentBox;

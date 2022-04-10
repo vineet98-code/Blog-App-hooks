@@ -1,38 +1,40 @@
-import React, { Component } from 'react';
+import React, { useState, useContext } from 'react';
 import { ARTICLES_URL } from '../utils/Constant';
 import validate from '../utils/Validate';
 import { withRouter } from 'react-router-dom';
 import UserContext from './UserContext';
 
-class NewPost extends Component {
-  state = {
+const addArticleIntial = {
+  title: '',
+  description: '',
+  body: '',
+  tagList: '',
+  errors: {
     title: '',
     description: '',
     body: '',
     tagList: '',
-    errors: {
-      title: '',
-      description: '',
-      body: '',
-      tagList: '',
-    },
-  };
-  static contextType = UserContext;
+  },
+};
+function AddPost (props) {
 
-  handleChange = (event) => {
+  const [addarticle, setAddarticle] = useState(addArticleIntial)
+  let { title, description, body, tagList, errors } = addarticle;
+  let { user } = useContext(UserContext);
+
+const handleChange = (event) => {
     let { name, value } = event.target;
-    let errors = this.state.errors;
     validate(errors, name, value);
-    this.setState({ [name]: value });
+    setAddarticle({ ...addarticle, [name]: value });
   };
 
-  handleSubmit = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
-    this.fetchData();
+    fetchData();
   };
 
-  fetchData() {
-    let { title, description, body, tagList } = this.state;
+  const fetchData = () => {
+    let { title, description, body, tagList } = addarticle;
 
     tagList = tagList.split(',').map((tag) => tag.trim()); //send it in the form of array, to remove the extra space
 
@@ -42,7 +44,7 @@ class NewPost extends Component {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Token ' + this.context.user.token,
+        Authorization: 'Token ' + user.token,
       },
       body: JSON.stringify(data),
     })
@@ -53,26 +55,21 @@ class NewPost extends Component {
         return res.json();
       })
       .then((article) => {
-        this.setState({ title: '', description: '', body: '', tagList: '' });
-        this.props.history.push('/'); // to access to the history use withRouter
+        setAddarticle({ title: '', description: '', body: '', tagList: '' });
+        props.history.push('/'); // to access to the history use withRouter
       })
       .catch((errors) => {
         console.log(errors);
       });
-  }
+  };
 
-
-  render() {
-
-    let { errors, title, description, body, tagList } = this.state;
-
-    return (
-      <section className="text-center pt-14 px-64">
-        <form onSubmit={this.handleSubmit} className="border p-8 rounded shadow py-3">
+  return (
+     <section className="text-center pt-14 px-64">
+        <form onSubmit={handleSubmit} className="border p-8 rounded shadow py-3">
 
           <h2 className="text-left text-xl">Write your Article...</h2>
           <input
-            onChange={this.handleChange}
+            onChange={handleChange}
             type="text"
             name="title"
             className="block w-full border rounded-lg border-gray-300 px-2  py-3 mx-auto mt-4 text-lg"
@@ -81,7 +78,7 @@ class NewPost extends Component {
           />
           <span className="text-red-500 block">{errors.title}</span>
           <input
-            onChange={this.handleChange}
+            onChange={handleChange}
             type="text"
             name="description"
             className="block w-full border rounded-lg border-gray-300 px-2 py-3 mx-auto mt-4 h-10"
@@ -90,7 +87,7 @@ class NewPost extends Component {
           />
           <span className="text-red-500 block">{errors.description}</span>
           <textarea
-            onChange={this.handleChange}
+            onChange={handleChange}
             name="body"
             className="block w-full border rounded-lg border-gray-300 px-2 py-3 mx-auto mt-4  text-gray-400"
             rows="4"
@@ -99,7 +96,7 @@ class NewPost extends Component {
           ></textarea>
           <span className="text-red-500 block">{errors.article}</span>
           <input
-            onChange={this.handleChange}
+            onChange={handleChange}
             name="tagList"
             type="text"
             className="block w-full border rounded-lg border-gray-300 px-2  py-3 mx-auto mt-4 h-10"
@@ -122,13 +119,12 @@ class NewPost extends Component {
                 !tagList
               }
             >
-              Publish Article
+              Add Article
             </button>
           </div>
         </form>
       </section>
     );
-  }
 }
 
-export default withRouter(NewPost);
+export default withRouter(AddPost);
